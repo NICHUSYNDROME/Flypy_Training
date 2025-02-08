@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>双拼输入练习</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 练习区域 -->
+        <div id="practice-area">
+            <!-- 当前汉字显示区 -->
+            <div id="current-hanzi" class="text-center" data-pinyin=""></div>
+            <!-- 用户输入显示区 -->
+            <div id="user-input" class="text-center"></div>
+            <!-- 提示信息区 -->
+            <div id="message" class="text-center"></div>
+        </div>
+
+        <!-- 分区选择导航栏 -->
+        <div id="partition-nav">
+            <h3>选择分区</h3>
+            <div class="partition-row">
+                <div class="partition-item" data-partition="左手高位区">
+                    <div class="partition-name">左手高位区</div>
+                    <div class="partition-keys">QWERT</div>
+                </div>
+                <div class="partition-item" data-partition="右手高位区">
+                    <div class="partition-name">右手高位区</div>
+                    <div class="partition-keys">YUIOP</div>
+                </div>
+            </div>
+            <div class="partition-row">
+                <div class="partition-item" data-partition="左手本位区">
+                    <div class="partition-name">左手本位区</div>
+                    <div class="partition-keys">ASDFG</div>
+                </div>
+                <div class="partition-item" data-partition="右手本位区">
+                    <div class="partition-name">右手本位区</div>
+                    <div class="partition-keys">HJKL</div>
+                </div>
+            </div>
+            <div class="partition-row">
+                <div class="partition-item" data-partition="左手低位区">
+                    <div class="partition-name">左手低位区</div>
+                    <div class="partition-keys">ZXCV</div>
+                </div>
+                <div class="partition-item" data-partition="右手低位区">
+                    <div class="partition-name">右手低位区</div>
+                    <div class="partition-keys">BNM</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
