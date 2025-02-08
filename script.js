@@ -38,6 +38,8 @@ let hanziData = []; // 定义一个全局变量存储从 JSON 加载的数据
 let selectedPartitions = []; // 选中的分区
 let currentHanzi = null; // 当前显示的汉字
 let userInput = []; // 用户输入的字符
+let singleLetterCount = 0; // 用于记录还需要多少个单字母组成的汉字的计数器
+let dataLoaded = false; // 用于记录 data.json 是否加载完成
 
 // 获取 DOM 元素
 const partitionNav = document.getElementById("partition-nav");
@@ -58,11 +60,14 @@ function loadHanziData() {
       .then(data => {
           hanziData = data;
           console.log("data.json 加载成功，开始初始化...");
+          dataLoaded = true;
           init();
       })
       .catch(error => {
           console.error('加载 JSON 文件失败:', error);
           alert('加载数据失败，请检查数据文件或网络连接');
+          // 控制台输出错误信息
+          console.error(error);
       });
 }
 
@@ -81,23 +86,46 @@ function initPartitionSelection() {
               this.classList.add("selected");
               selectedPartitions.push(partition);
           }
-          // 刷新右侧展示
+          // 控制台输出选中的分区
+          console.log("选中的分区:", selectedPartitions);
+          // 刷新提示区展示
           updateDisplay();
       });
   }
 }
 
-// 刷新右侧展示
+// 刷新提示区展示
 function updateDisplay() {
   if (selectedPartitions.length === 0) {
-      // 如果没有选中任何分区，清空右侧展示
+      // 如果没有选中任何分区，清空提示区展示
       currentHanziElement.textContent = "";
       currentHanziElement.dataset.pinyin = "";
       userInput = [];
       userInputElement.innerHTML = "";
       messageElement.textContent = "请从下方选择分区";
+      singleLetterCount = 0;
   } else {
       // 如果有选中分区，重新初始化练习
+      if (selectedPartitions.length === 1) {
+          const partition = selectedPartitions[0];
+          if (partition === "左手本位区") {
+              singleLetterCount = 5;
+          } else if (partition === "右手本位区") {
+              singleLetterCount = 4;
+          } else if (partition === "左手高位区") {
+              singleLetterCount = 5;
+          } else if (partition === "右手高位区") {
+              singleLetterCount = 5;
+          } else if (partition === "左手低位区") {
+              singleLetterCount = 4;
+          } else if (partition === "右手低位区") {
+              singleLetterCount = 3;
+          } else {
+              singleLetterCount = 0;
+          }
+      } else {
+          singleLetterCount = 0;
+      }
       initPractice();
   }
 }
@@ -109,16 +137,59 @@ function initPractice() {
       messageElement.textContent = "请从下方选择分区";
       return;
   }
-  currentHanzi = getRandomHanzi(selectedPartitions);
-  if (!currentHanzi) {
-      messageElement.textContent = "无法加载汉字，请选择其他分区";
-      return;
+
+  let hanzi = null;
+  if (singleLetterCount > 0) {
+      const partition = selectedPartitions[0];
+      let letters = "";
+      if (partition === "左手本位区") {
+          letters = "asdfg";
+      } else if (partition === "右手本位区") {
+          letters = "hjkl";
+      } else if (partition === "左手高位区") {
+          letters = "qwert";
+      } else if (partition === "右手高位区") {
+          letters = "yuiop";
+      } else if (partition === "左手低位区") {
+          letters = "zxcv";
+      } else if (partition === "右手低位区") {
+          letters = "bnm";
+      }
+
+      if (letters) {
+          const letterIndex = letters.length - singleLetterCount;
+          const letter = letters[letterIndex];
+          hanzi = getHanziByEncoding(letter + letter);
+          singleLetterCount--;
+      }
+  } else {
+      hanzi = getRandomHanzi(selectedPartitions);
+  }
+  currentHanzi = hanzi;
+
+  if (!hanzi) {
+    initPractice();
   }
 
-  currentHanziElement.textContent = currentHanzi.hanzi;
-  currentHanziElement.dataset.pinyin = currentHanzi.pinyin;
+  currentHanziElement.textContent = hanzi.hanzi;
+  currentHanziElement.dataset.pinyin = hanzi.pinyin;
   userInput = [];
   userInputElement.innerHTML = "";
+  console.log("currentHanzi assigned:", hanzi);
+}
+
+// 根据 encoding 选择汉字
+function getHanziByEncoding(encoding) {
+  const filteredData = hanziData.filter(hanzi => {
+      return hanzi.encoding.toLowerCase() === encoding.toLowerCase();
+  });
+
+  if (filteredData.length === 0) {
+      console.error(`没有匹配 encoding 为 ${encoding} 的汉字！`);
+      return null;
+  }
+  const randomIndex = Math.floor(Math.random() * filteredData.length);
+  return filteredData[randomIndex];
 }
 
 // 随机选择汉字
@@ -140,6 +211,7 @@ function getRandomHanzi(selectedPartitions) {
 
 // 监听用户输入
 document.addEventListener("keypress", function (event) {
+  if (!dataLoaded) return;
 
   // 忽略回车键
   if (event.key === 'Enter' || event.key === 'Space') {
@@ -235,11 +307,14 @@ function checkInput() {
 
 // 初始化
 function init() {
-  initPartitionSelection();
+
   // 默认选择左手本位区
   selectedPartitions = ["左手本位区"];
+  singleLetterCount = 5;
   document.querySelector("[data-partition='左手本位区']").classList.add("selected");
+  initPartitionSelection();
   initPractice();
+
 }
 
 // 启动
