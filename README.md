@@ -52,10 +52,10 @@
 ## 示例截图
 
 ### 练习区域
-![练习区域](readme\partition_area.png)
+![练习区域](readme/partition_area.png)
 
 ### 分区选择导航栏
-![分区选择导航栏](readme\partition_area.png)
+![分区选择导航栏](readme/partition_area.png)
 
 ## 数据文件说明
 
